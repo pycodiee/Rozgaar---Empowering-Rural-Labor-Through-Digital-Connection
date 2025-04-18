@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROZGAAR - Labor Profile</title>
+    
+    <!-- Tailwind and Bootstrap CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-black: #000000;
+            --primary-white: #F4F3EE;
+        }
+
+        body {
+            background-color: var(--primary-white);
+            color: var(--primary-black);
+            padding-top: 76px;
+        }
+
+        .profile-section {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .profile-header {
+            position: relative;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .verification-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 110px;
+            background: #28a745;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .skill-badge {
+            background-color: var(--primary-white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .skill-badge:hover {
+            transform: translateY(-2px);
+        }
+
+        .rating-stars {
+            color: #ffd700;
+        }
+
+        .work-card {
+            background-color: var(--primary-white);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .work-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .availability-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #28a745;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 1;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card {
+            background-color: var(--primary-white);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .review-card {
+            background-color: var(--primary-white);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .certificate-badge {
+            background-color: var(--primary-white);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .icon-input-group {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .icon-input-group:hover {
+            border-color: var(--primary-black);
+            transform: translateY(-2px);
+        }
+
+        .icon-input-group.active {
+            border-color: var(--primary-black);
+            background-color: var(--primary-white);
+        }
+
+        .large-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1rem;
+        }
+
+        .skill-icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .skill-icon-item {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .skill-icon-item:hover,
+        .skill-icon-item.selected {
+            background: var(--primary-black);
+            color: var(--primary-white);
+        }
+
+        .time-slot {
+            padding: 0.5rem;
+            margin: 0.25rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-slot.selected {
+            background: var(--primary-black);
+            color: var(--primary-white);
+        }
+
+        .language-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-option:hover {
+            transform: translateX(10px);
+        }
+
+        .language-option.selected {
+            background: var(--primary-black);
+            color: var(--primary-white);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">ROZGAAR</a>
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline-dark">Edit Profile</button>
+                <button class="btn btn-dark">Dashboard</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-section">
+            <div class="text-center mb-4">
+                <div class="position-relative d-inline-block">
+                    <img src="/images/profile-placeholder.jpg" alt="Profile Picture" class="profile-picture">
+                    <button class="btn btn-dark position-absolute bottom-0 end-0">
+                        <i data-lucide="camera"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Name Input -->
+            <div class="icon-input-group">
+                <i data-lucide="user" class="large-icon"></i>
+                <h3 class="h5 mb-2">What's your name?</h3>
+                <input type="text" class="form-control form-control-lg" placeholder="Tap to enter your name">
+            </div>
+        </div>
+
+        <!-- Work Type Selection -->
+        <div class="profile-section">
+            <h2 class="h4 mb-4">What work do you do?</h2>
+            <div class="skill-icon-grid">
+                <div class="skill-icon-item">
+                    <i data-lucide="hammer" class="mb-2"></i>
+                    <div>Carpenter</div>
+                </div>
+                <div class="skill-icon-item">
+                    <i data-lucide="wrench" class="mb-2"></i>
+                    <div>Plumber</div>
+                </div>
+                <div class="skill-icon-item">
+                    <i data-lucide="zap" class="mb-2"></i>
+                    <div>Electrician</div>
+                </div>
+                <div class="skill-icon-item">
+                    <i data-lucide="paint-bucket" class="mb-2"></i>
+                    <div>Painter</div>
+                </div>
+                <div class="skill-icon-item">
+                    <i data-lucide="hard-hat" class="mb-2"></i>
+                    <div>Mason</div>
+                </div>
+                <div class="skill-icon-item">
+                    <i data-lucide="settings" class="mb-2"></i>
+                    <div>Mechanic</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Level -->
+        <div class="profile-section">
+            <h2 class="h4 mb-4">How many years of experience?</h2>
+            <div class="d-flex flex-wrap gap-3">
+                <div class="icon-input-group text-center">
+                    <div class="h1">1+</div>
+                    <div>Beginner</div>
+                </div>
+                <div class="icon-input-group text-center">
+                    <div class="h1">3+</div>
+                    <div>Intermediate</div>
+                </div>
+                <div class="icon-input-group text-center">
+                    <div class="h1">5+</div>
+                    <div>Expert</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Working Hours -->
+        <div class="profile-section">
+            <h2 class="h4 mb-4">When can you work?</h2>
+            <div class="mb-4">
+                <h3 class="h5 mb-3">Days</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="time-slot">Mon</div>
+                    <div class="time-slot">Tue</div>
+                    <div class="time-slot">Wed</div>
+                    <div class="time-slot">Thu</div>
+                    <div class="time-slot">Fri</div>
+                    <div class="time-slot">Sat</div>
+                    <div class="time-slot">Sun</div>
+                </div>
+            </div>
+            <div>
+                <h3 class="h5 mb-3">Time</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    <div class="time-slot">Morning</div>
+                    <div class="time-slot">Afternoon</div>
+                    <div class="time-slot">Evening</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Languages -->
+        <div class="profile-section">
+            <h2 class="h4 mb-4">Languages you speak?</h2>
+            <div class="language-option">
+                <i data-lucide="message-circle"></i>
+                <span>Hindi</span>
+            </div>
+            <div class="language-option">
+                <i data-lucide="message-circle"></i>
+                <span>English</span>
+            </div>
+            <div class="language-option">
+                <i data-lucide="message-circle"></i>
+                <span>Kannada</span>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="text-center mb-5">
+            <button class="btn btn-dark btn-lg px-5">
+                <i data-lucide="check" class="me-2"></i>
+                Save Profile
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // GSAP Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate profile sections
+        gsap.from('.profile-section', {
+            scrollTrigger: {
+                trigger: '.profile-section',
+                start: 'top 80%',
+            },
+            y: 30,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.2,
+            ease: 'power2.out'
+        });
+
+        // Click handlers
+        document.querySelectorAll('.skill-icon-item').forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('selected');
+            });
+        });
+
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.addEventListener('click', () => {
+                slot.classList.toggle('selected');
+            });
+        });
+
+        document.querySelectorAll('.language-option').forEach(option => {
+            option.addEventListener('click', () => {
+                option.classList.toggle('selected');
+            });
+        });
+
+        document.querySelectorAll('.icon-input-group').forEach(group => {
+            group.addEventListener('click', () => {
+                group.classList.toggle('active');
+            });
+        });
+
+        // Add this script before the closing </body> tag
+const saveProfile = async () => {
+    try {
+      // Collect the selected work types
+      const workTypes = Array.from(document.querySelectorAll('.skill-icon-item.selected'))
+        .map(item => item.querySelector('div').textContent.trim());
+  
+      // Collect the selected working days
+      const workingDays = Array.from(document.querySelectorAll('.time-slot.selected'))
+        .filter(slot => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].includes(slot.textContent.trim()))
+        .map(slot => slot.textContent.trim());
+  
+      // Collect the selected working times
+      const workingTimes = Array.from(document.querySelectorAll('.time-slot.selected'))
+        .filter(slot => ['Morning', 'Afternoon', 'Evening'].includes(slot.textContent.trim()))
+        .map(slot => slot.textContent.trim());
+  
+      // Collect the selected languages
+      const languages = Array.from(document.querySelectorAll('.language-option.selected'))
+        .map(option => option.querySelector('span').textContent.trim());
+  
+      const formData = {
+        name: document.querySelector('input[placeholder="Tap to enter your name"]').value,
+        work_type: workTypes,
+        experience_level: document.querySelector('.icon-input-group.active')?.querySelector('.h1')?.textContent.trim(),
+        location: 'Current Location', // You'll want to update this with actual location data
+        working_days: workingDays,
+        working_times: workingTimes,
+        languages: languages
+      };
+  
+      const response = await fetch('/labour-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+  
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Profile saved successfully!');
+        // Optionally redirect or update UI
+      } else {
+        throw new Error(result.error || 'Failed to save profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to save profile. Please try again.');
+    }
+  };
+  
+  // Add click handler to the save button
+  document.querySelector('button.btn-dark.btn-lg').addEventListener('click', saveProfile);
+    </script>
+</body>
+</html>

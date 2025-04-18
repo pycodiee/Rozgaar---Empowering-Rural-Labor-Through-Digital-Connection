@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROZGAAR - Post a Job</title>
+    
+    <!-- Tailwind and Bootstrap CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-black: #000000;
+            --primary-white: #F4F3EE;
+        }
+
+        body {
+            background-color: var(--primary-white);
+            color: var(--primary-black);
+            min-height: 100vh;
+            padding-top: 76px; /* Height of navbar */
+        }
+
+        .navbar {
+            background-color: var(--primary-white);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .form-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 800px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .form-label {
+            color: var(--primary-black);
+            font-weight: 500;
+        }
+
+        .form-control, .form-select {
+            background-color: var(--primary-white);
+            border: 1px solid rgba(0,0,0,0.1);
+            color: var(--primary-black);
+        }
+
+        .requirement-item {
+            background-color: var(--primary-white);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .section-heading {
+            color: var(--primary-black);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            color: var(--primary-black);
+        }
+
+        .location-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .location-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .section-heading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary-black);
+            transition: width 0.3s ease;
+        }
+
+        .section-heading:hover::after {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">ROZGAAR</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center my-5">
+            <h1 class="display-5 fw-bold mb-3">Post a New Job</h1>
+            <p class="lead mb-5">Find the right professional for your project by providing detailed information about your requirements.</p>
+        </div>
+
+        <!-- Job Posting Form -->
+        <div class="form-container">
+            <form id="jobPostForm" class="needs-validation" novalidate>
+                <!-- Basic Information -->
+                <div class="mb-5">
+                    <h3 class="section-heading">
+                        <i data-lucide="file-text" class="section-icon"></i>
+                        Basic Information
+                    </h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" name="title" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Category</label>
+                            <select name="category" class="form-select" required>
+                                <option value="">Select Category</option>
+                                <option>Construction</option>
+                                <option>Plumbing</option>
+                                <option>Electrical</option>
+                                <option>Carpentry</option>
+                                <option>Painting</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Job Description</label>
+                            <textarea name="description" class="form-control" rows="4" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location and Timeline -->
+                <div class="mb-5">
+                    <h3 class="section-heading">
+                        <i data-lucide="map-pin" class="section-icon"></i>
+                        Location & Timeline
+                    </h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Work Location</label>
+                            <div class="input-group">
+                                <input type="text" name="location" class="form-control" id="locationInput" required>
+                                <button type="button" class="btn btn-outline-dark location-btn" id="shareLocation">
+                                    <i data-lucide="navigation" style="width: 18px; height: 18px;"></i>
+                                    Share Location
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Location Type</label>
+                            <select name="locationType" class="form-select" required>
+                                <option value="">Select Type</option>
+                                <option>On-site</option>
+                                <option>Remote</option>
+                                <option>Hybrid</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="startDate" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Duration</label>
+                            <select name="duration" class="form-select" required>
+                                <option value="">Select Duration</option>
+                                <option>1-3 days</option>
+                                <option>1 week</option>
+                                <option>2 weeks</option>
+                                <option>1 month</option>
+                                <option>Long term</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requirements -->
+                <div class="mb-5">
+                    <h3 class="section-heading">
+                        <i data-lucide="list-checks" class="section-icon"></i>
+                        Requirements & Skills
+                    </h3>
+                    <div id="requirementsList">
+                        <div class="requirement-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <input type="text" class="form-control" placeholder="Add requirement">
+                                <i data-lucide="x" class="ms-2" style="cursor: pointer;"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline-dark mt-3" id="addRequirement">
+                        <i data-lucide="plus" class="me-2"></i> Add Requirement
+                    </button>
+                </div>
+
+                <!-- Budget -->
+                <div class="mb-5">
+                    <h3 class="section-heading">
+                        <i data-lucide="wallet" class="section-icon"></i>
+                        Budget Information
+                    </h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Budget Range</label>
+                            <select name="budgetRange" class="form-select" required>
+                                <option value="">Select Range</option>
+                                <option>₹1000 - ₹5000</option>
+                                <option>₹5000 - ₹10000</option>
+                                <option>₹10000 - ₹20000</option>
+                                <option>₹20000+</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Payment Type</label>
+                            <select name="paymentType" class="form-select" required>
+                                <option value="">Select Type</option>
+                                <option>Fixed Price</option>
+                                <option>Hourly Rate</option>
+                                <option>Daily Rate</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-dark btn-lg px-5">Post Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Requirements list functionality
+        const requirementsList = document.getElementById('requirementsList');
+        const addRequirementBtn = document.getElementById('addRequirement');
+
+        addRequirementBtn.addEventListener('click', () => {
+            const newRequirement = document.createElement('div');
+            newRequirement.className = 'requirement-item';
+            newRequirement.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <input type="text" class="form-control" placeholder="Add requirement">
+                    <i data-lucide="x" class="ms-2" style="cursor: pointer;"></i>
+                </div>
+            `;
+            requirementsList.appendChild(newRequirement);
+            lucide.createIcons();
+        });
+
+        // Remove requirement
+        requirementsList.addEventListener('click', (e) => {
+            if (e.target.closest('[data-lucide="x"]')) {
+                e.target.closest('.requirement-item').remove();
+            }
+        });
+
+        // Form submission
+document.getElementById('jobPostForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.innerHTML = 'Posting job...';
+    submitButton.disabled = true;
+    
+    try {
+        // Form validation
+        const form = e.target;
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            throw new Error('Please fill in all required fields');
+        }
+
+        // Get coordinates from location input
+        const locationInput = document.getElementById('locationInput');
+        let latitude = 0, longitude = 0;
+        
+        if (locationInput.value) {
+            try {
+                const searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput.value)}`;
+                const response = await fetch(searchUrl);
+                const data = await response.json();
+                
+                if (data && data[0]) {
+                    latitude = parseFloat(data[0].lat);
+                    longitude = parseFloat(data[0].lon);
+                }
+            } catch (error) {
+                console.error('Error getting coordinates:', error);
+                // Continue with submission even if geocoding fails
+            }
+        }
+
+        // Gather all requirements - filter out empty values
+        const requirements = Array.from(document.querySelectorAll('.requirement-item input'))
+            .map(input => input.value.trim())
+            .filter(value => value !== '');
+
+        // Create the job data object with validation
+        const jobData = {
+            title: document.querySelector('input[name="title"]').value || '',
+            description: document.querySelector('textarea[name="description"]').value || '',
+            category: document.querySelector('select[name="category"]').value || '',
+            location: locationInput.value || '',
+            latitude: latitude || 0,
+            longitude: longitude || 0,
+            location_type: document.querySelector('select[name="locationType"]').value || '',
+            start_date: document.querySelector('input[name="startDate"]').value || '',
+            duration: document.querySelector('select[name="duration"]').value || '',
+            salary_range: document.querySelector('select[name="budgetRange"]').value || '',
+            payment_type: document.querySelector('select[name="paymentType"]').value || '',
+            requirements: requirements || []
+        };
+
+        // Validate jobData before sending
+        for (const [key, value] of Object.entries(jobData)) {
+            if (value === undefined) {
+                jobData[key] = ''; // Replace undefined with empty string
+            }
+        }
+
+        console.log('Submitting job data:', jobData); // Log the sanitized data
+
+        // Send the data to the server
+        const response = await fetch('/client-post', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jobData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.success) {
+            alert(result.message || 'Job posted successfully!');
+            console.log('Job posted successfully:', result);
+            window.location.href = '/home';
+        } else {
+            throw new Error(result.error || 'Failed to post job');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to post job: ' + error.message);
+    } finally {
+        // Reset button state
+        submitButton.innerHTML = originalButtonText;
+        submitButton.disabled = false;
+    }
+});
+
+        // Location sharing functionality
+        document.getElementById('shareLocation').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                this.innerHTML = '<i data-lucide="loader" class="animate-spin"></i> Getting Location...';
+                lucide.createIcons();
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        // Get location details using reverse geocoding
+                        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`)
+                            .then(response => response.json())
+                            .then(data => {
+                                const locationInput = document.getElementById('locationInput');
+                                locationInput.value = data.display_name;
+                                
+                                // Reset button
+                                const shareBtn = document.getElementById('shareLocation');
+                                shareBtn.innerHTML = '<i data-lucide="navigation"></i> Share Location';
+                                lucide.createIcons();
+                                
+                                // Show success animation
+                                shareBtn.classList.add('btn-success');
+                                setTimeout(() => shareBtn.classList.remove('btn-success'), 2000);
+                            })
+                            .catch(error => {
+                                alert('Error getting location details. Please enter manually.');
+                                const shareBtn = document.getElementById('shareLocation');
+                                shareBtn.innerHTML = '<i data-lucide="navigation"></i> Share Location';
+                                lucide.createIcons();
+                            });
+                    },
+                    function(error) {
+                        alert('Error getting location. Please enter manually.');
+                        const shareBtn = document.getElementById('shareLocation');
+                        shareBtn.innerHTML = '<i data-lucide="navigation"></i> Share Location';
+                        lucide.createIcons();
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by your browser');
+            }
+        });
+
+        // Add smooth scroll animation for form sections
+        document.querySelectorAll('.section-heading').forEach(heading => {
+            heading.addEventListener('click', () => {
+                const section = heading.parentElement;
+                section.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Add hover animation for form controls
+        document.querySelectorAll('.form-control, .form-select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'transform 0.3s ease';
+            });
+
+            element.addEventListener('blur', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Animate requirements when added
+        const originalAddRequirement = addRequirementBtn.onclick;
+        addRequirementBtn.onclick = function() {
+            originalAddRequirement.call(this);
+            const newItem = requirementsList.lastElementChild;
+            newItem.style.animation = 'fadeIn 0.3s ease-out';
+        };
+    </script>
+</body>
+</html>

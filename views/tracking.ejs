@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROZGAAR - Work Tracking</title>
+    
+    <!-- Tailwind and Bootstrap CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --primary-black: #000000;
+            --primary-white: #F4F3EE;
+        }
+
+        /* Video call button styles */
+        .video-call-btn {
+            background: var(--primary-black);
+            color: var(--primary-white);
+            padding: 12px 24px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid var(--primary-black);
+        }
+
+        .video-call-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: var(--primary-white);
+            color: var(--primary-black);
+        }
+
+        .video-call-btn i {
+            transition: all 0.3s ease;
+        }
+
+        .video-call-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        body {
+            background-color: var(--primary-white);
+            color: var(--primary-black);
+            min-height: 100vh;
+        }
+
+        .progress-container {
+            width: 100%;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000;
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.2) 50%, 
+                rgba(255,255,255,0) 100%);
+            animation: progressGlow 2s infinite;
+        }
+
+        .step-container {
+            margin-top: 50px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0.5;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: scale(0.95);
+        }
+
+        .step-card.active {
+            opacity: 1;
+            transform: scale(1);
+            border: 2px solid #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .step-card.completed {
+            opacity: 0.8;
+            background: #f8f9fa;
+            transform: translateX(20px);
+        }
+
+        .step-title {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .step-title:hover {
+            transform: translateY(-2px);
+        }
+
+        .step-content {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .step-card.active .step-content {
+            display: block;
+        }
+
+        .photo-upload {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload:hover {
+            border-color: #000;
+            transform: translateY(-3px);
+        }
+
+        .photo-preview {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .btn-next {
+            background: #000;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .btn-next.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .completion-check {
+            display: none;
+            color: green;
+            transition: all 0.5s ease;
+            transform: scale(0);
+        }
+
+        .step-card.completed .completion-check {
+            display: inline;
+            transform: scale(1);
+        }
+
+        @keyframes progressGlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .active .h5 {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes checkmarkPop {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .checkmark-animation {
+            animation: checkmarkPop 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Header with title and video call button -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="text-3xl font-bold mb-0">Work Progress Tracking</h1>
+                    <a href="/views/webrtc/index" class="video-call-btn" onclick="initiateVideoCall()">
+                        <i data-lucide="video" size="18"></i>
+                        Video Call
+                    </a>
+                </div>
+
+                <script>
+                    // Add tracking ID to the page if it exists in the URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const jobId = urlParams.get('job_id');
+                    if (jobId) {
+                        document.body.setAttribute('data-job-id', jobId);
+                    }
+                </script>
+                
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="mt-2 text-end">
+                        <span id="progress-percentage">0%</span> Complete
+                    </div>
+                </div>
+
+                <!-- Steps -->
+                <div class="step-container">
+                    <!-- Step 1: Initial Assessment -->
+                    <div class="step-card active" data-step="1">
+                        <div class="step-title" onclick="openStep(1)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="h5 mb-0">Initial Assessment</h3>
+                                <i data-lucide="check-circle" class="completion-check"></i>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <p class="text-muted mt-2">Verify worker has arrived and assessed the work</p>
+                            <div class="mt-3">
+                                <button class="btn btn-next active" onclick="completeStep(1)">
+                                    Confirm Assessment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Work Commencement -->
+                    <div class="step-card" data-step="2">
+                        <div class="step-title" onclick="openStep(2)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="h5 mb-0">Work Commencement</h3>
+                                <i data-lucide="check-circle" class="completion-check"></i>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <p class="text-muted mt-2">Confirm work has started</p>
+                            <div class="mt-3">
+                                <button class="btn btn-next" onclick="completeStep(2)">
+                                    Confirm Work Started
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Progress Check -->
+                    <div class="step-card" data-step="3">
+                        <div class="step-title" onclick="openStep(3)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="h5 mb-0">Progress Check</h3>
+                                <i data-lucide="check-circle" class="completion-check"></i>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <p class="text-muted mt-2">Verify work progress is on track</p>
+                            <div class="mt-3">
+                                <button class="btn btn-next" onclick="completeStep(3)">
+                                    Confirm Progress
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Work Completion -->
+                    <div class="step-card" data-step="4">
+                        <div class="step-title" onclick="openStep(4)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="h5 mb-0">Work Completion</h3>
+                                <i data-lucide="check-circle" class="completion-check"></i>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <p class="text-muted mt-2">Document completed work with photos</p>
+                            <div class="mt-3">
+                                <div class="photo-upload" onclick="document.getElementById('work-photos').click()">
+                                    <i data-lucide="camera" class="mb-2"></i>
+                                    <p>Click to upload work photos</p>
+                                    <input type="file" id="work-photos" hidden accept="image/*" multiple onchange="handlePhotos(event)">
+                                </div>
+                                <div id="photo-preview" class="mt-3"></div>
+                                <button class="btn btn-next mt-3" onclick="completeStep(4)">
+                                    Confirm Completion
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Payment Processing -->
+                    <div class="step-card" data-step="5">
+                        <div class="step-title" onclick="openStep(5)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h3 class="h5 mb-0">Payment Processing</h3>
+                                <i data-lucide="check-circle" class="completion-check"></i>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <p class="text-muted mt-2">Process payment for completed work</p>
+                            <div class="mt-3">
+                                <a href="/payment" class="btn btn-next" onclick="processPayment()">
+                                    Process Payment
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        let currentStep = 1;
+        let uploadedPhotos = false;
+
+        // Video call function
+        function initiateVideoCall() {
+            gsap.to('.video-call-btn', {
+                scale: 0.95,
+                duration: 0.1,
+                yoyo: true,
+                repeat: 1,
+                ease: "power2.out"
+            });
+            
+            alert('Initiating video call...');
+        }
+
+        // Function to update the progress bar
+        function updateProgress(step) {
+            const totalSteps = 5;
+            const percentage = ((step - 1) / (totalSteps - 1)) * 100;
+            const progressFill = document.querySelector('.progress-fill');
+            const progressPercentage = document.getElementById('progress-percentage');
+
+            gsap.to(progressFill, {
+                duration: 0.8,
+                width: `${percentage}%`,
+                ease: "power2.out",
+                onUpdate: () => {
+                    progressPercentage.textContent = `${Math.round(percentage)}%`;
+                }
+            });
+        }
+
+        // Initialize tracking when page loads
+        async function initializeTracking() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const jobId = urlParams.get('job_id');
+            
+            if (!jobId) {
+                console.error('No job ID provided');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tracking/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ job_id: jobId })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    window.trackingId = data.tracking.id;
+                    updateProgress(1);
+                } else {
+                    console.error('Failed to initialize tracking:', data.error);
+                }
+            } catch (error) {
+                console.error('Error initializing tracking:', error);
+            }
+        }
+
+        // Function to complete a step
+        async function completeStep(step) {
+            if (!window.trackingId) {
+                console.error('No tracking ID available');
+                return;
+            }
+
+            if (step === 4 && !uploadedPhotos) {
+                gsap.to('.photo-upload', {
+                    duration: 0.4,
+                    y: 5,
+                    repeat: 3,
+                    yoyo: true,
+                    ease: "power1.inOut"
+                });
+                return;
+            }
+
+            const statusMap = {
+                1: 'initial_assessment',
+                2: 'work_commenced',
+                3: 'progress_check',
+                4: 'work_completed',
+                5: 'payment_processed'
+            };
+
+            try {
+                const response = await fetch(`/api/tracking/${window.trackingId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: statusMap[step],
+                        notes: `Step ${step} completed`
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    // Proceed with UI updates
+                    const currentCard = document.querySelector(`.step-card[data-step="${step}"]`);
+                    const nextCard = document.querySelector(`.step-card[data-step="${step + 1}"]`);
+
+                    // ... rest of your existing animation code ...
+
+                    currentStep = step + 1;
+                    updateProgress(currentStep);
+                }
+            } catch (error) {
+                console.error('Error completing step:', error);
+            }
+        }
+
+        // Function to handle photo uploads
+        async function handlePhotos(event) {
+            const files = event.target.files;
+            if (!files.length || !window.trackingId) return;
+
+            const formData = new FormData();
+            Array.from(files).forEach(file => {
+                formData.append('photos', file);
+            });
+
+            try {
+                const response = await fetch(`/api/tracking/${window.trackingId}/photos`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    uploadedPhotos = true;
+                    const nextButton = document.querySelector(`.step-card[data-step="4"] .btn-next`);
+                    nextButton.classList.add('active');
+
+                    // Update photo preview
+                    const previewContainer = document.getElementById('photo-preview');
+                    previewContainer.innerHTML = '';
+
+                    data.photos.forEach(photo => {
+                        const img = document.createElement('img');
+                        img.src = `/api/photos/${photo.id}`;
+                        img.className = 'photo-preview mt-2';
+                        img.style.display = 'block';
+                        previewContainer.appendChild(img);
+
+                        gsap.from(img, {
+                            duration: 0.6,
+                            scale: 0.8,
+                            opacity: 0,
+                            ease: "back.out(1.2)"
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error uploading photos:', error);
+            }
+        }
+
+        // Initialize tracking when page loads
+        document.addEventListener('DOMContentLoaded', initializeTracking);
+
+        // Function to open a step
+        function openStep(step) {
+            const stepCard = document.querySelector(`.step-card[data-step="${step}"]`);
+            if (step === currentStep) {
+                stepCard.classList.add('active');
+                stepCard.querySelector('.step-content').style.display = 'block';
+            }
+        }
+
+        // Function to complete a step
+        function completeStep(step) {
+            if (step === 4 && !uploadedPhotos) {
+                gsap.to('.photo-upload', {
+                    duration: 0.4,
+                    y: 5,
+                    repeat: 3,
+                    yoyo: true,
+                    ease: "power1.inOut"
+                });
+                return;
+            }
+
+            const currentCard = document.querySelector(`.step-card[data-step="${step}"]`);
+            const nextCard = document.querySelector(`.step-card[data-step="${step + 1}"]`);
+
+
+            gsap.to(currentCard, {
+                duration: 0.6,
+                x: 20,
+                opacity: 0.8,
+                ease: "power2.out",
+                onComplete: () => currentCard.classList.add('completed')
+            });
+
+            const checkmark = currentCard.querySelector('.completion-check');
+            gsap.to(checkmark, {
+                duration: 0.6,
+                scale: 1,
+                ease: "elastic.out(1, 0.5)",
+                onStart: () => checkmark.classList.add('checkmark-animation')
+            });
+
+            // Animate next card entry
+            if (nextCard) {
+                gsap.fromTo(nextCard, {
+                    opacity: 0,
+                    scale: 0.9,
+                    y: 30
+                }, {
+                    duration: 0.8,
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                    ease: "back.out(1.4)",
+                    onStart: () => {
+                        nextCard.classList.add('active');
+                        const nextButton = nextCard.querySelector('.btn-next');
+                        if (nextButton) nextButton.classList.add('active');
+                    }
+                });
+            }
+
+            currentStep = step + 1;
+            updateProgress(currentStep);
+        }
+
+        // Function to handle photo uploads
+        function handlePhotos(event) {
+            const files = event.target.files;
+            const previewContainer = document.getElementById('photo-preview');
+            previewContainer.innerHTML = '';
+
+            if (files.length > 0) {
+                uploadedPhotos = true;
+                const nextButton = document.querySelector(`.step-card[data-step="4"] .btn-next`);
+                nextButton.classList.add('active');
+
+                Array.from(files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'photo-preview mt-2';
+                        img.style.display = 'block';
+                        previewContainer.appendChild(img);
+
+                        // Animate photo preview
+                        gsap.from(img, {
+                            duration: 0.6,
+                            scale: 0.8,
+                            opacity: 0,
+                            ease: "back.out(1.2)"
+                        });
+                    }
+                    reader.readAsDataURL(file);
+                });
+            }
+        }
+
+        // Function to process payment
+        function processPayment() {
+            const paymentCard = document.querySelector(`.step-card[data-step="5"]`);
+            paymentCard.classList.remove('active');
+            paymentCard.classList.add('completed');
+
+            // Show completion message
+            const completionMessage = document.createElement('div');
+            completionMessage.className = 'alert alert-success mt-4';
+            completionMessage.innerHTML = `
+                <h4 class="alert-heading">Work Complete!</h4>
+                <p>Payment has been processed successfully. Thank you for using ROZGAAR.</p>
+                <hr>
+                <p class="mb-0">You can rate your experience and provide feedback.</p>
+                <div class="mt-3">
+                    <button class="btn btn-dark" onclick="window.location.href='/feedback'">
+                        Provide Feedback
+                    </button>
+                </div>
+            `;
+            document.querySelector('.step-container').appendChild(completionMessage);
+
+            // Animate the completion message
+            gsap.from(completionMessage, {
+                duration: 1,
+                scale: 0.8,
+                opacity: 0,
+                rotation: -5,
+                ease: "elastic.out(1, 0.5)"
+            });
+        }
+
+        // Initial animations
+        gsap.from('.step-card', {
+            duration: 1,
+            y: 50,
+            opacity: 1,
+            stagger: 0.15,
+            ease: "power2.out",
+            delay: 0.3
+        });
+
+        gsap.from('h1', {
+            duration: 0.8,
+            y: -30,
+            opacity: 0,
+            ease: "power4.out"
+        });
+
+        //const urlParams = new URLSearchParams(window.location.search);
+        //const jobId = urlParams.get('job_id');
+        //if (jobId) {
+          // document.body.setAttribute('data-job-id', jobId);
+        //}
+    </script>
+</body>
+</html>
